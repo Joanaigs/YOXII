@@ -1,11 +1,5 @@
 :- consult('board.pl').
-
-
-startGame(_player, _player2) :-
-    initialBoard(Board),
-    initialPiecesWhite(WhitePieces),
-    initialPiecesBlack(BlackPieces),
-    drawGame(Board,WhitePieces, BlackPieces).
+:- consult('game.pl').
 
 manageInput(1) :- 
     startGame('P','P'),

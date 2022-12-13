@@ -1,12 +1,14 @@
 initialBoard([
-    [invalid,invalid,empty,empty,empty,invalid, invalid],
+    [invalid,invalid,empty,empty,token,invalid, invalid],
     [invalid,empty,empty,empty,empty,empty,invalid],
     [empty,empty,empty,empty,empty,empty,empty],
-    [empty,empty,empty,token,empty,empty,empty],
+    [empty,empty,empty,empty,empty,empty,empty],
     [empty,empty,empty,empty,empty,empty,empty],
     [invalid,empty,empty,empty,empty,empty,invalid],
     [invalid,invalid,empty,empty,empty,invalid, invalid]
     ]).
+
+
 
 
 
@@ -23,17 +25,15 @@ symbol(whiteThree,S) :- S='y'.
 symbol(whiteFour,S) :- S='x'.
 symbol(token,S) :- S='#'.
 
-letter(1, L) :- L='A'.
-letter(2, L) :- L='B'.
-letter(3, L) :- L='C'.
-letter(4, L) :- L='D'.
-letter(5, L) :- L='E'.
-letter(6, L) :- L='F'.
-letter(7, L) :- L='G'.
-letter(8, L) :- L='H'.
-letter(9, L) :- L='I'.
-letter(10, L) :- L='J'.
-letter(11, L) :- L='K'.
+letter(1, 'a').
+letter(2, 'b').
+letter(3, 'c').
+letter(4, 'd').
+letter(5, 'e').
+letter(6, 'f').
+letter(7, 'g').
+
+
 
 piecesWhite(['o', '"', 'y', 'x']).
 initialPiecesWhite([5, 5, 5, 3]).
