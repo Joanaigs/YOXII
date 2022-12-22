@@ -1,14 +1,17 @@
 :- consult('board.pl').
 :- consult('game.pl').
+:- consult('token.pl').
+:- consult('piece.pl').
 
-manageInput(1) :- 
+manageInput('1') :- 
     startGame('P','P'),
     mainMenu.
 
 mainMenu :-
     printMainMenu,
     askMenuOption,
-    read(Input),
+    get_char(Input),
+    skip_line,
     manageInput(Input).
 
 

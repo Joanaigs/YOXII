@@ -13,17 +13,17 @@ initialBoard([
 
 
 
-symbol(invalid,S) :- S='-'.
-symbol(empty,S) :- S=' '.
-symbol(blackOne,S) :- S='O'.
-symbol(blackTwo,S) :- S='='.
-symbol(blackThree,S) :- S='Y'.
-symbol(blackFour,S) :- S='X'.
-symbol(whiteOne,S) :- S='o'.
-symbol(whiteTwo,S) :- S='"'.
-symbol(whiteThree,S) :- S='y'.
-symbol(whiteFour,S) :- S='x'.
-symbol(token,S) :- S='#'.
+symbol(invalid,'-', _).
+symbol(empty,' ', _).
+symbol(blackOne,'O', black).
+symbol(blackTwo,'=', black).
+symbol(blackThree,'Y', black).
+symbol(blackFour,'X', black).
+symbol(redOne,'o', red).
+symbol(redTwo,'"', red).
+symbol(redThree,'y', red).
+symbol(redFour,'x', red).
+symbol(token,'#', _).
 
 letter(1, 'a').
 letter(2, 'b').
@@ -33,39 +33,62 @@ letter(5, 'e').
 letter(6, 'f').
 letter(7, 'g').
 
+points(redOne, 1).
+points(redTwo, 2).
+points(redThree, 3).
+points(redFour, 4).
+points(blackOne, 1).
+points(blackTwo, 2).
+points(blackThree, 3).
+points(blackFour, 4).
+points(token, 0).
+points(empty, 0).
+points(invalid, 0).
 
 
-piecesWhite(['o', '"', 'y', 'x']).
-initialPiecesWhite([5, 5, 5, 3]).
+
+/*
+piecesred(['0', '"', 'y', 'x']).
+initialPiecesred([5, 5, 5, 3]).
 piecesBlack(['O', '=', 'Y', 'X']).
 initialPiecesBlack([5, 5, 5, 3]).
+*/
 
+initialPiecesRed([redOne-5, redTwo-5, redThree-5, redFour-3]).
+initialPiecesBlack([blackOne-5, blackTwo-5, blackThree-5, blackFour-3]).
 
-drawGame(Board, WhitePieces, BlackPieces) :-
+drawGame(Board, Player, RedPieces, BlackPieces) :-
     nl,
-    write('          White Pieces:'),nl,
-    piecesWhite(WhiteSymbols),
+    write('          Player '),
+    write(Player),
+    nl,nl,
+    write('          red Pieces:'),nl,
     write('           '),
-    drawPieces(WhiteSymbols), nl,
+    drawSymbols(RedPieces), nl,
     write('           '),
-    drawPieces(WhitePieces),
+    drawPieces(RedPieces),
     nl,
     printBoard(Board),
     nl,
-    write('          Black Pieces:'),
-    nl,
-    piecesBlack(BlackSymbols),
+    write('          Black Pieces:'),nl,
     write('           '),
-    drawPieces(BlackSymbols), nl,
+    drawSymbols(BlackPieces), nl,
     write('           '),
     drawPieces(BlackPieces).
 
 
+drawSymbols([]).
+drawSymbols([X-_n|XS]) :- 
+                symbol(X, S, _),
+                write(S),
+                write('  '),
+                drawSymbols(XS).
 drawPieces([]).
-drawPieces([X|XS]) :- 
-                write(X),
+drawPieces([_x-N|XS]) :- 
+                write(N),
                 write('  '),
                 drawPieces(XS).
+                    
                     
 
 
@@ -90,7 +113,7 @@ printMatrix([Head|Tail], N) :-
 printLine([]).
 
 printLine([Head|Tail]) :-
-    symbol(Head, S),
+    symbol(Head, S, _),
     write(S),
     write(' | '),
     printLine(Tail).

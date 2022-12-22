@@ -4,51 +4,79 @@ convertToInt(StringNumber, Number) :-atom_chars(StringNumber, Z), number_chars(N
 
 startGame(_player, _player2) :-
     initialBoard(Board),
-    initialPiecesWhite(WhitePieces),
+    initialPiecesRed(RedPieces),
     initialPiecesBlack(BlackPieces),
-    drawGame(Board,WhitePieces, BlackPieces),
-
-    game_cycle(Board, red, WhitePieces, BlackPieces).
+    game_cycle(Board, red, RedPieces, BlackPieces).
     
-/*
-game_cycle(GameState-Player):-
-                    game_over(GameState, Winner), !,
-                    congratulate(Winner).*/
 next_player(red, black).
 next_player(black, red).
 
-game_cycle(Board, Player, WhitePieces, BlackPieces):-
-                    choose_move(Board, Player, NewBoard ),
+
+getPlayersPieces(red, RedPieces, _BlackPieces, RedPieces).
+getPlayersPieces(black, _RedPieces, BlackPieces, BlackPieces).
+
+% updatePlayersPieces(red, OldRedPieces, OldBlackPieces, Pieces,  NewRedPieces, NewBlackPieces).
+updatePlayersPieces(red, _, OldBlackPieces, Pieces,  Pieces, OldBlackPieces).
+updatePlayersPieces(black, OldRedPieces, _, Pieces,  OldRedPieces, Pieces).
+
+game_over(Board, Player) :- 
+    \+ valid_moves_token(Board, Player, _Moves).
+
+getPoints(Board, TLine-TCol, Direction, Player, Points, NewPoints) :- 
+                                                        previous_cell(TLine-TCol, Direction, Line-Col),
+                                                        getPiece(Board, Line-Col, Piece),
+                                                        symbol(Piece, _, Player),
+                                                        points(Piece, PiecePoints),
+                                                        NewPoints is Points + PiecePoints.
+getPoints(_, _, _, _, Points, Points).
+
+countPoints(Board, Player, Points) :-
+        getPiece(Board, TLine-TCol, token),
+        getPoints(Board, TLine-TCol, up,        Player, 0      , Points1),
+        getPoints(Board, TLine-TCol, down,      Player, Points1, Points2),
+        getPoints(Board, TLine-TCol, right,     Player, Points2, Points3),
+        getPoints(Board, TLine-TCol, left,      Player, Points3, Points4),
+        getPoints(Board, TLine-TCol, upLeft,    Player, Points4, Points5),
+        getPoints(Board, TLine-TCol, upRight,   Player, Points5, Points6),
+        getPoints(Board, TLine-TCol, downLeft,  Player, Points6, Points7),
+        getPoints(Board, TLine-TCol, downRight, Player, Points7, Points).
+
+congratulations(Player, RedPoints, BlackPoints) :- RedPoints > BlackPoints, !, write('Congratulations '), write(Player), write(' you won!'), nl.
+congratulations(Player, RedPoints, BlackPoints) :- BlackPoints > RedPoints, !, write('Congratulations '), write(Player), write(' you won!'), nl.
+congratulations(Player, RedPoints, BlackPoints) :- write('You tied'), nl.
+
+
+game_cycle(Board, Player, _, _):- 
+                    game_over(Board, Player), !,
+                    write('Game Over!'),nl,
+                    countPoints(Board, red, RedPoints),
+                    write('Red: '), write(RedPoints),nl,
+                    countPoints(Board, black, BlackPoints),
+                    write('Black: '), write(BlackPoints),nl
+                    .
+
+game_cycle(Board, Player, RedPieces, BlackPieces):-
+                    drawGame(Board, Player, RedPieces, BlackPieces),
+                    choose_move_token(Board, Player, TempBoard ),
+                    drawGame(TempBoard, Player, RedPieces, BlackPieces),
+                    getPlayersPieces(Player, RedPieces, BlackPieces, Pieces),
+                    choosePiece(TempBoard, Player, NewBoard,Pieces, NewPieces),
+                    updatePlayersPieces(Player, RedPieces, BlackPieces, NewPieces, NewRedPieces, NewBlackPieces),
                     next_player(Player, NextPlayer),
-                    drawGame(NewBoard,WhitePieces, BlackPieces), !,
-                    game_cycle(NewBoard, NextPlayer, WhitePieces, BlackPieces).
+                    game_cycle(NewBoard, NextPlayer, NewRedPieces, NewBlackPieces).
 
 % The user choose the next move   
 change_number_letter([], []).
 change_number_letter([X-Y|L1], [X1-Y|L2]) :- letter(X, Z), X1 = Z, change_number_letter(L1, L2).
 
-choose_move(Board, Player, NewBoard):-
-                    moveToken(Board, NewBoard, Player).  
-choose_move(Board, Player, NewBoard):- write('wrong Input'), nl, choose_move(Board, Player, NewBoard).          
-
 select_move(_, []) :- fail.              
 select_move(Line-Column, [Line-Column|_]) .
 select_move(Line-Column, [_|Moves]) :- select_move(Line-Column, Moves).
                     
-moveToken(Board, NewBoard, Player) :- nl,
-                            write('Possible moves'), 
-                            valid_moves(Board, Player, Moves), change_number_letter(Moves, Result), 
-                            write(Result),
-                            nl,
-                            write('Choose the token position (Ex: d-3)'),
-                            getPosition(Line-Column),!,
-                            select_move(Line-Column, Moves),
-                            
-                            getPiece(Board, TokenL-TokenC, token),
-                            move(Board, NewBoard, TokenL-TokenC, Line-Column).
-
-
-getPosition(Line-Column) :-  read(CharLine-Column), letter(Line, CharLine).
+getPosition(Line-Column) :- get_char(CharLine), get_char(Sep), get_char(CharCol), skip_line,
+                            Sep == '-',
+                            letter(Line, CharLine),
+                            convertToInt(CharCol, Column).
 
 replace([_|L], 1, New, [New|L]).
 replace([X|List1], Index, New, [X|List2]) :-  Index>1,
@@ -58,25 +86,10 @@ replace([X|List1], Index, New, [X|List2]) :-  Index>1,
 setPiece([Line|Board], [NewLine|Board], 1, Column, Piece) :- replace(Line, Column, Piece, Result), NewLine=Result.
 setPiece([Line|Board], [Line|NewBoard], IndexLine, Column, Piece) :- Temp is IndexLine-1, setPiece(Board, NewBoard, Temp, Column, Piece).
 
-move(Board, NewBoard, OldLine-OldColumn, NewLine-NewColumn) :- 
-        getPiece(Board, OldLine-OldColumn, Piece),
-        setPiece(Board, TmpBoard, NewLine, NewColumn, Piece),
-        setPiece(TmpBoard, NewBoard, OldLine, OldColumn, empty).
-
 getPiece(Board, Line-Column, Piece) :-
     nth1(Line, Board, BoardLine),
     nth1(Column, BoardLine, Piece).
 
-
-get_direction(Line-Column, TokenL-TokenC, Direction) :- 
-                                                     DiffLine is (TokenL - Line), DiffCol is (TokenC - Column),
-                                                    
-                                                    ((DiffCol==0, DiffLine>0, Direction=down);(DiffCol==0, DiffLine<0, Direction=up);
-                                                     (DiffCol>0, DiffLine==0, Direction=right);(DiffCol<0, DiffLine==0, Direction=left);
-                                                     (DiffCol<0, DiffLine<0,DiffLine==DiffCol, Direction=upLeft);
-                                                     (DiffCol<0, DiffLine>0,AbsDiffLine is abs(DiffLine),  AbsDiffCol is abs(DiffCol), AbsDiffLine==AbsDiffCol, Direction=downLeft);
-                                                     (DiffCol>0, DiffLine<0,AbsDiffLine is abs(DiffLine),  AbsDiffCol is abs(DiffCol), AbsDiffLine==AbsDiffCol, Direction=upRight);
-                                                     (DiffCol>0, DiffLine>0,DiffLine==DiffCol, Direction=downRight)).
 
 previous_cell(Line-Column, up, PLine-PColumn) :- PLine is Line-1, PColumn is Column.
 previous_cell(Line-Column, down, PLine-PColumn) :- PLine is Line+1, PColumn is Column.
@@ -87,41 +100,21 @@ previous_cell(Line-Column, upRight, PLine-PColumn) :- PLine is Line-1, PColumn i
 previous_cell(Line-Column, downLeft, PLine-PColumn) :- PLine is Line+1, PColumn is Column-1.
 previous_cell(Line-Column, downRight, PLine-PColumn) :- PLine is Line+1, PColumn is Column+1.
 
-gotoToken(_Board, TokenL-TokenC, _Direction, _Player, TokenL-TokenC).
-gotoToken(Board, Line-Column, Direction, Player, TokenL-TokenC) :- getPiece(Board, Line-Column, Piece), Piece == Player,
-                                                        previousCell(Line-Column, Direction,  PLine-PColumn),
-                                                        gotoToken(Board, PLine-PColumn, Direction, Player, TokenL-TokenC).
-                                                             
-
-check_move(Board, Player, Line-Column) :-
-                                        getPiece(Board, Line-Column, Piece), 
-                                        Piece == empty, 
-                                        getPiece(Board, TokenL-TokenC, token), 
-                                        get_direction(Line-Column, TokenL-TokenC, Direction), 
-                                        previous_cell(Line-Column, Direction,  PLine-PColumn),
-                                        gotoToken(Board, PLine-PColumn, Direction, Player, TokenL-TokenC).
-
-
-
-
-valid_moves(Board, Player,Moves):-
-    findall(Line-Column, check_move(Board, Player, Line-Column), Moves).
-
 
  /*   
     % interaction to select move
-choose_move(GameState, computer-Level, Move):-
-    valid_moves(GameState, Moves),
-    choose_move(Level, GameState, Moves, Move).
+choose_move_token(GameState, computer-Level, Move):-
+    valid_moves_token(GameState, Moves),
+    choose_move_token(Level, GameState, Moves, Move).
 
-valid_moves(GameState, Moves):-
+valid_moves_token(GameState, Moves):-
     findall(Move, move(GameState, Move, NewState), Moves).
 
 
 
-choose_move(1, _GameState, Moves, Move):-
+choose_move_token(1, _GameState, Moves, Move):-
     random_select(Move, Moves, _Rest).
-choose_move(2, GameState, Moves, Move):-
+choose_move_token(2, GameState, Moves, Move):-
     setof(Value-Mv, NewState^( member(Mv, Moves),
     move(GameState, Mv, NewState),
     evaluate_board(NewState, Value) ), [_V-Move|_]).*/
