@@ -1,27 +1,83 @@
 :- use_module(library(lists)).
 
+
 convertToInt(StringNumber, Number) :-atom_chars(StringNumber, Z), number_chars(Number, Z).
 
-startGame(_player, _player2) :-
+
+/**
+ * startGame(+ThisTurn, +NextTurn)
+ *      @param ThisTurn
+ *      @param NextTurn
+ * 
+ *      Prints the board and the players remaning pieces and starts the game
+ */
+startGame(ThisTurn, NextTurn) :-
     initialBoard(Board),
     initialPiecesRed(RedPieces),
-    initialPiecesBlack(BlackPieces),
-    game_cycle(Board, red, RedPieces, BlackPieces).
+    initialPiecesWhite(WhitePieces),
+    game_cycle(ThisTurn, NextTurn, Board, white, RedPieces, WhitePieces).
     
-next_player(red, black).
-next_player(black, red).
+
+/**
+ * next_player(+Player1, +Player2)
+ *      @param Player1
+ *      @param Player2
+ * 
+ *      Predicate used to change the player playing 
+ */
+next_player(red, white).
+next_player(white, red).
 
 
-getPlayersPieces(red, RedPieces, _BlackPieces, RedPieces).
-getPlayersPieces(black, _RedPieces, BlackPieces, BlackPieces).
+/**
+ * get_players_pieces(+Player, +RedPieces, +WhitePieces, -PlayerPieces)
+ *      @param Player
+ *      @param RedPieces
+ *      @param WhitePieces
+ *      @param PlayerPieces
+ * 
+ *      Returns the pieces of the player
+ */
+get_players_pieces(red, RedPieces, _WhitePieces, RedPieces).
+get_players_pieces(white, _RedPieces, WhitePieces, WhitePieces).
 
-% updatePlayersPieces(red, OldRedPieces, OldBlackPieces, Pieces,  NewRedPieces, NewBlackPieces).
-updatePlayersPieces(red, _, OldBlackPieces, Pieces,  Pieces, OldBlackPieces).
-updatePlayersPieces(black, OldRedPieces, _, Pieces,  OldRedPieces, Pieces).
+/**
+ * update_players_pieces(+Player, +OldRedPieces, +OldWhitePieces, +Pieces, -NewRedPieces, -NewWhitePieces)
+ *      @param Player
+ *      @param OldRedPieces
+ *      @param OldWhitePieces
+ *      @param Pieces
+ *      @param NewRedPieces
+ *      @param NewWhitePieces
+ * 
+ *      Updates the pieces of the player after a move
+ */
+update_players_pieces(red, _, OldWhitePieces, Pieces,  Pieces, OldWhitePieces).
+update_players_pieces(white, OldRedPieces, _, Pieces,  OldRedPieces, Pieces).
 
+
+/**
+ * game_over(+Board, +Player)
+ *      @param Board
+ *      @param Player
+ * 
+ *      Checks if the game is over by seing if the player has any moves left
+ */
 game_over(Board, Player) :- 
     \+ valid_moves_token(Board, Player, _Moves).
 
+
+/**
+ * getPoints(+Board, +TokenPosition, +Direction, +Player, +Points, -NewPoints)
+ *      @param Board
+ *      @param TokenPosition
+ *      @param Direction
+ *      @param Player
+ *      @param Points
+ *      @param NewPoints
+ * 
+ * Calculates the points of the player in a certain direction of the token and returns them in NewPoints
+ */
 getPoints(Board, TLine-TCol, Direction, Player, Points, NewPoints) :- 
                                                         previous_cell(TLine-TCol, Direction, Line-Col),
                                                         getPiece(Board, Line-Col, Piece),
@@ -30,6 +86,16 @@ getPoints(Board, TLine-TCol, Direction, Player, Points, NewPoints) :-
                                                         NewPoints is Points + PiecePoints.
 getPoints(_, _, _, _, Points, Points).
 
+
+
+/** 
+ * countPoints(+Board, +Player, -Points)
+ *      @param Board
+ *      @param Player
+ *      @param Points
+ * 
+ *      Calculates the points of the player by summing the values of their pieces that suround the token 
+ */
 countPoints(Board, Player, Points) :-
         getPiece(Board, TLine-TCol, token),
         getPoints(Board, TLine-TCol, up,        Player, 0      , Points1),
@@ -41,56 +107,135 @@ countPoints(Board, Player, Points) :-
         getPoints(Board, TLine-TCol, downLeft,  Player, Points6, Points7),
         getPoints(Board, TLine-TCol, downRight, Player, Points7, Points).
 
-congratulations(Player, RedPoints, BlackPoints) :- RedPoints > BlackPoints, !, write('Congratulations '), write(Player), write(' you won!'), nl.
-congratulations(Player, RedPoints, BlackPoints) :- BlackPoints > RedPoints, !, write('Congratulations '), write(Player), write(' you won!'), nl.
-congratulations(Player, RedPoints, BlackPoints) :- write('You tied'), nl.
+
+/** 
+ * congratulations(+RedPoints, +WhitePoints)
+ *      @param RedPoints
+ *      @param WhitePoints
+ * 
+ *      Checks witch player was the winner
+ */
+congratulations(RedPoints, WhitePoints) :- RedPoints > WhitePoints, !, write('Congratulations red you won!'), nl.
+congratulations(RedPoints, WhitePoints) :- WhitePoints > RedPoints, !, write('Congratulations whitWhite you won!'), nl.
+congratulations(_RedPoints, _WhitePoints) :- write('You tied'), nl.
 
 
-game_cycle(Board, Player, _, _):- 
-                    game_over(Board, Player), !,
+
+/**
+ * game_cycle(+ThisTurn, +NextTurn, +Board, +Player, +RedPieces, WhitePieces)
+ *      @param ThisTurn
+ *      @param NextTurn
+ *      @param Board
+ *      @param Player
+ *      @param RedPieces
+ *      @param WhitePieces
+ * 
+ *      The cycle of the game, where we start by seeing if the game has enough conditions to finish, and if not then the current player chooses their moves and give turn to the other player to do the same.
+ */
+game_cycle(_, _, Board, Player, RedPieces, WhitePieces):- 
+                    draw_game(Board, Player, RedPieces, WhitePieces),
+                    game_over(Board, Player), !, nl,
                     write('Game Over!'),nl,
                     countPoints(Board, red, RedPoints),
                     write('Red: '), write(RedPoints),nl,
-                    countPoints(Board, black, BlackPoints),
-                    write('Black: '), write(BlackPoints),nl
-                    .
+                    countPoints(Board, whitWhite, WhitePoints),
+                    write('White: '), write(WhitePoints),nl,nl,
+                    congratulations(RedPoints, WhitePoints).
 
-game_cycle(Board, Player, RedPieces, BlackPieces):-
-                    drawGame(Board, Player, RedPieces, BlackPieces),
-                    choose_move_token(Board, Player, TempBoard ),
-                    drawGame(TempBoard, Player, RedPieces, BlackPieces),
-                    getPlayersPieces(Player, RedPieces, BlackPieces, Pieces),
-                    choosePiece(TempBoard, Player, NewBoard,Pieces, NewPieces),
-                    updatePlayersPieces(Player, RedPieces, BlackPieces, NewPieces, NewRedPieces, NewBlackPieces),
+game_cycle(ThisTurn, NextTurn ,Board, Player, RedPieces, WhitePieces):-
+                    choose_move(Board, Player, ThisTurn, RedPieces, WhitePieces, NewBoard, NewPieces),
+                    
+                    % update players pieces
+                    update_players_pieces(Player, RedPieces, WhitePieces, NewPieces, NewRedPieces, NewWhitePieces),
                     next_player(Player, NextPlayer),
-                    game_cycle(NewBoard, NextPlayer, NewRedPieces, NewBlackPieces).
+                    nl,nl,
+                    game_cycle(NextTurn, ThisTurn, NewBoard, NextPlayer, NewRedPieces, NewWhitePieces).
 
-% The user choose the next move   
+
+
+/** 
+ * change_number_letter(+ValidMoves, -ValidMovesBoard)
+ *      @param ValidMoves
+ *      @param ValidMovesBoard
+ * 
+ *      Receives a list of Moves of type Number-Number and changes it to an array of Moves of type Char-Number, for example '1-1' turns to 'a-1'
+ */
 change_number_letter([], []).
 change_number_letter([X-Y|L1], [X1-Y|L2]) :- letter(X, Z), X1 = Z, change_number_letter(L1, L2).
 
+/** 
+ * select_move(+Move, +ValidMoves)
+ *      @param Move
+ *      @param ValidMoves
+ * 
+ *      Checks if the Move received is in the List of valid moves
+ */
 select_move(_, []) :- fail.              
 select_move(Line-Column, [Line-Column|_]) .
 select_move(Line-Column, [_|Moves]) :- select_move(Line-Column, Moves).
-                    
+
+
+/** 
+ * getPosition(-Move)
+ *      @param Move
+ * 
+ *      Reads the move from terminal of type 'char-number' and turns it into number-number, for example 'a-1' becomes 1-1
+ */              
 getPosition(Line-Column) :- get_char(CharLine), get_char(Sep), get_char(CharCol), skip_line,
                             Sep == '-',
                             letter(Line, CharLine),
                             convertToInt(CharCol, Column).
 
+
+/** 
+ * replace(+List1, +Index, +New, -List2)
+ *      @param List1
+ *      @param Index
+ *      @param New
+ *      @param List2
+ * 
+ *      Replaces a element of a list with the new one at the given position
+ */
 replace([_|L], 1, New, [New|L]).
 replace([X|List1], Index, New, [X|List2]) :-  Index>1,
                                             N1 is Index-1,
                                             replace(List1,N1, New, List2).
 
+
+/** 
+ * setPiece(+Board, -NewBoard, +Line, +Column, +NewElem)
+ *      @param Board
+ *      @param NewBoard
+ *      @param Line
+ *      @param Column
+ *      @param NewElem
+ * 
+ *      Selects a line of the board where a element of a certain column is changed with the help of the predicate replace
+ */
 setPiece([Line|Board], [NewLine|Board], 1, Column, Piece) :- replace(Line, Column, Piece, Result), NewLine=Result.
 setPiece([Line|Board], [Line|NewBoard], IndexLine, Column, Piece) :- Temp is IndexLine-1, setPiece(Board, NewBoard, Temp, Column, Piece).
 
+
+/** 
+ * getPiece(+Board, ?Position, ?Piece)
+ *      @param Board
+ *      @param Position
+ *      @param Piece
+ * 
+ *      Returns the element in the position given of the board or returns the position of an element on the board
+ */
 getPiece(Board, Line-Column, Piece) :-
     nth1(Line, Board, BoardLine),
     nth1(Column, BoardLine, Piece).
 
-
+/**
+ * previous_cell(+PositionElement, +Direction, -PositionDiretion)
+ *      @param PositionElement
+ *      @param Direction
+ *      @param PositionDiretion
+ * 
+ *      Returns the position of the element next to them in that direction
+ */
 previous_cell(Line-Column, up, PLine-PColumn) :- PLine is Line-1, PColumn is Column.
 previous_cell(Line-Column, down, PLine-PColumn) :- PLine is Line+1, PColumn is Column.
 previous_cell(Line-Column, left, PLine-PColumn) :- PLine is Line, PColumn is Column-1.
@@ -100,21 +245,3 @@ previous_cell(Line-Column, upRight, PLine-PColumn) :- PLine is Line-1, PColumn i
 previous_cell(Line-Column, downLeft, PLine-PColumn) :- PLine is Line+1, PColumn is Column-1.
 previous_cell(Line-Column, downRight, PLine-PColumn) :- PLine is Line+1, PColumn is Column+1.
 
-
- /*   
-    % interaction to select move
-choose_move_token(GameState, computer-Level, Move):-
-    valid_moves_token(GameState, Moves),
-    choose_move_token(Level, GameState, Moves, Move).
-
-valid_moves_token(GameState, Moves):-
-    findall(Move, move(GameState, Move, NewState), Moves).
-
-
-
-choose_move_token(1, _GameState, Moves, Move):-
-    random_select(Move, Moves, _Rest).
-choose_move_token(2, GameState, Moves, Move):-
-    setof(Value-Mv, NewState^( member(Mv, Moves),
-    move(GameState, Mv, NewState),
-    evaluate_board(NewState, Value) ), [_V-Move|_]).*/
