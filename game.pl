@@ -70,7 +70,7 @@ game_over(Board, Player) :-
 /**
  * getPoints(+Board, +TokenPosition, +Direction, +Player, +Points, -NewPoints)
  *      @param Board
- *      @param TokenPosition
+ *      @param TokenPosition (TokenLine-TokenCol)
  *      @param Direction
  *      @param Player
  *      @param Points
@@ -155,8 +155,8 @@ game_cycle(ThisTurn, NextTurn ,Board, Player, RedPieces, WhitePieces):-
 
 /** 
  * change_number_letter(+ValidMoves, -ValidMovesBoard)
- *      @param ValidMoves
- *      @param ValidMovesBoard
+ *      @param ValidMoves [(Line-Column))]
+ *      @param ValidMovesBoard [(Line-Column))]
  * 
  *      Receives a list of Moves of type Number-Number and changes it to an array of Moves of type Char-Number, for example '1-1' turns to 'a-1'
  */
@@ -165,8 +165,8 @@ change_number_letter([X-Y|L1], [X1-Y|L2]) :- letter(X, Z), X1 = Z, change_number
 
 /** 
  * select_move(+Move, +ValidMoves)
- *      @param Move
- *      @param ValidMoves
+ *      @param Move (Line-Column)
+ *      @param ValidMoves [(Line-Column))]
  * 
  *      Checks if the Move received is in the List of valid moves
  */
@@ -177,7 +177,7 @@ select_move(Line-Column, [_|Moves]) :- select_move(Line-Column, Moves).
 
 /** 
  * getPosition(-Move)
- *      @param Move
+ *      @param Move (line-column)
  * 
  *      Reads the move from terminal of type 'char-number' and turns it into number-number, for example 'a-1' becomes 1-1
  */              
@@ -219,7 +219,7 @@ setPiece([Line|Board], [Line|NewBoard], IndexLine, Column, Piece) :- Temp is Ind
 /** 
  * getPiece(+Board, ?Position, ?Piece)
  *      @param Board
- *      @param Position
+ *      @param Position (line-column)
  *      @param Piece
  * 
  *      Returns the element in the position given of the board or returns the position of an element on the board
@@ -230,9 +230,9 @@ getPiece(Board, Line-Column, Piece) :-
 
 /**
  * previous_cell(+PositionElement, +Direction, -PositionDiretion)
- *      @param PositionElement
+ *      @param PositionElement (line-column)
  *      @param Direction
- *      @param PositionDiretion
+ *      @param PositionDiretion (line-column)
  * 
  *      Returns the position of the element next to them in that direction
  */
