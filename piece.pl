@@ -21,8 +21,7 @@ readPiece(Pieces, Piece, Player) :- get_char(Symbol), skip_line,
  *      This predicate is used to choose the move of a piece of the Player choosing.
  *          If the mode is 'H' the player chooses the move (from input), 
  *          if the mode is 'PC' the computer chooses the move using diferent algoritms .
- *              level 1 - random move
- *              level 2 - greedy algorithm    
+ *              level 1 - random move 
  *  
 */
 choose_move_piece(Board, Player, NewBoard, Pieces, NewPieces, 'H'):- nl,
@@ -46,20 +45,9 @@ choose_move_piece(Board, _, NewBoard, Pieces, NewPieces, 'PC'-1):-
     usePiece(Pieces, Piece, NewPieces),
     letter(Line, CharLine),
     symbol(Piece, Symbol, _),
-    nl,write('Add piece '), write(Symbol) , write(' to ') , write(CharLine-Column), nl,
+    nl,write('Add piece '), write(Symbol) , write(' to ') , write(CharLine-Column), nl.
     sleep(1).
 
-choose_move_piece(Board, _, NewBoard, Pieces, NewPieces, 'PC'-2):- 
-    setof(Piece, existPiece(Pieces, Piece), PiecesList),
-    random_member(Piece, PiecesList),
-    valid_moves_piece(Board, Moves),
-    random_member(Line-Column, Moves),
-    setPiece(Board, NewBoard, Line, Column, Piece),
-    usePiece(Pieces, Piece, NewPieces),
-    letter(Line, CharLine),
-    symbol(Piece, Symbol, _),
-    nl,write('Add piece '), write(Symbol) , write(' to ') , write(CharLine-Column), nl,
-    sleep(1).
     
 
 /**

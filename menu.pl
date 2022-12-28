@@ -44,7 +44,7 @@ play :-
     write('> Insert your option: '),
     get_char(Input),
     skip_line,
-    manageInput(Input).
+    manageInput(Input), !,
     play.
 
 /**
@@ -60,7 +60,8 @@ askLevel(Level) :-
     skip_line,
     convertToInt(Input, Level),
     (Level = 1; Level = 2).
-    askLevel(Level) :-
+
+askLevel(Level) :-
     write('Invalid Level!'),nl,
     askLevel(Level).
 

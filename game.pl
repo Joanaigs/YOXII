@@ -81,8 +81,8 @@ game_over(Board, Player) :-
 getPoints(Board, TLine-TCol, Direction, Player, Points, NewPoints) :- 
                                                         previous_cell(TLine-TCol, Direction, Line-Col),
                                                         getPiece(Board, Line-Col, Piece),
-                                                        symbol(Piece, _, Player),
-                                                        points(Piece, PiecePoints),
+                                                        symbol(Piece, _, Player), 
+                                                        points(Piece, PiecePoints), 
                                                         NewPoints is Points + PiecePoints.
 getPoints(_, _, _, _, Points, Points).
 
@@ -96,16 +96,16 @@ getPoints(_, _, _, _, Points, Points).
  * 
  *      Calculates the points of the player by summing the values of their pieces that suround the token 
  */
-countPoints(Board, Player, Points) :-
+countPoints(Board, Player, Points, Pieces) :-
         getPiece(Board, TLine-TCol, token),
-        getPoints(Board, TLine-TCol, up,        Player, 0      , Points1),
-        getPoints(Board, TLine-TCol, down,      Player, Points1, Points2),
-        getPoints(Board, TLine-TCol, right,     Player, Points2, Points3),
-        getPoints(Board, TLine-TCol, left,      Player, Points3, Points4),
-        getPoints(Board, TLine-TCol, upLeft,    Player, Points4, Points5),
-        getPoints(Board, TLine-TCol, upRight,   Player, Points5, Points6),
-        getPoints(Board, TLine-TCol, downLeft,  Player, Points6, Points7),
-        getPoints(Board, TLine-TCol, downRight, Player, Points7, Points).
+        getPoints(Board, TLine-TCol, up,        Player, 0      , Points1), (Points1 > 0 -> Pieces1 = Pieces + 1; Pieces1 = 0), 
+        getPoints(Board, TLine-TCol, down,      Player, Points1, Points2), (Points1 == Points2 -> Pieces2 = Pieces1 + 1; Pieces2 = Pieces1), 
+        getPoints(Board, TLine-TCol, right,     Player, Points2, Points3), (Points2 == Points3 -> Pieces3 = Pieces2 + 1; Pieces3 = Pieces2), 
+        getPoints(Board, TLine-TCol, left,      Player, Points3, Points4), (Points3 == Points4 -> Pieces4 = Pieces3 + 1; Pieces4 = Pieces3),  
+        getPoints(Board, TLine-TCol, upLeft,    Player, Points4, Points5), (Points4 == Points5 -> Pieces5 = Pieces4 + 1; Pieces5 = Pieces4),  
+        getPoints(Board, TLine-TCol, upRight,   Player, Points5, Points6), (Points5 == Points6 -> Pieces6 = Pieces5 + 1; Pieces6 = Pieces5),  
+        getPoints(Board, TLine-TCol, downLeft,  Player, Points6, Points7), (Points6 == Points7 -> Pieces7 = Pieces6 + 1; Pieces7 = Pieces6),  
+        getPoints(Board, TLine-TCol, downRight, Player, Points7, Points),  (Points7 == Points ->  Pieces = Pieces7 + 1; Pieces = Pieces7).
 
 
 /** 
@@ -115,11 +115,11 @@ countPoints(Board, Player, Points) :-
  * 
  *      Checks witch player was the winner
  */
-congratulations(RedPoints, WhitePoints) :- RedPoints > WhitePoints, !, write('Congratulations red you won!'), nl.
-congratulations(RedPoints, WhitePoints) :- WhitePoints > RedPoints, !, write('Congratulations whitWhite you won!'), nl.
-congratulations(_RedPoints, _WhitePoints) :- write('You tied'), nl.
-
-
+congratulations(RedPoints, WhitePoints, _NumPiecesRed, _NumPiecesWhite) :- RedPoints > WhitePoints, !, write('Congratulations red you won!'), nl.
+congratulations(RedPoints, WhitePoints,  _NumPiecesRed, _NumPiecesWhite) :- WhitePoints > RedPoints, !, write('Congratulations white you won!'), nl.
+congratulations(_RedPoints, _WhitePoints,  NumPiecesRed, NumPiecesWhite) :- NumPiecesRed > NumPiecesWhite, !, write('Congratulations red you won! You had more Pieces surrounding the token'), nl.
+congratulations(_RedPoints, _WhitePoints,  NumPiecesRed, NumPiecesWhite) :- NumPiecesRed < NumPiecesWhite, !, write('Congratulations white you won! You had more Pieces surrounding the token'), nl.
+congratulations(_RedPoints, _WhitePoints,  NumPiecesRed, NumPiecesWhite) :- write('You tied'), nl.
 
 /**
  * game_cycle(+ThisTurn, +NextTurn, +Board, +Player, +RedPieces, WhitePieces)
@@ -136,15 +136,14 @@ game_cycle(_, _, Board, Player, RedPieces, WhitePieces):-
                     draw_game(Board, Player, RedPieces, WhitePieces),
                     game_over(Board, Player), !, nl,
                     write('Game Over!'),nl,
-                    countPoints(Board, red, RedPoints),
+                    countPoints(Board, red, RedPoints, NumRedPieces),
                     write('Red: '), write(RedPoints),nl,
-                    countPoints(Board, whitWhite, WhitePoints),
+                    countPoints(Board, white, WhitePoints, NumWhitePieces ),
                     write('White: '), write(WhitePoints),nl,nl,
-                    congratulations(RedPoints, WhitePoints).
+                    congratulations(RedPoints, WhitePoints, NumRedPieces,  NumWhitePieces).
 
 game_cycle(ThisTurn, NextTurn ,Board, Player, RedPieces, WhitePieces):-
                     choose_move(Board, Player, ThisTurn, RedPieces, WhitePieces, NewBoard, NewPieces),
-                    
                     % update players pieces
                     update_players_pieces(Player, RedPieces, WhitePieces, NewPieces, NewRedPieces, NewWhitePieces),
                     next_player(Player, NextPlayer),

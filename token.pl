@@ -26,10 +26,10 @@ choose_move_token(Board, Player, NewBoard, 'PC'-1):-
     getPiece(Board, TokenL-TokenC, token),
     move(Board, NewBoard, TokenL-TokenC, Line-Column),
     letter(Line,CharLine),
-    nl, write('Move token to ') , write(CharLine-Column), nl,
+    nl, write('Move token to ') , write(CharLine-Column), nl.
     sleep(1).
 
-choose_move_token(Board, Player, NewBoard, 'PC'-2).
+choose_move_token(_Board, _Player, _NewBoard, 'PC'-2).
 
     
 /**

@@ -7,7 +7,7 @@
 initialBoard([
     [invalid,invalid,empty,empty,empty,invalid, invalid],
     [invalid,empty,empty,empty,empty,empty,invalid],
-    [empty,empty,empty,empty,empty,redFour,empty],
+    [empty,empty,empty,empty,empty,empty,empty],
     [empty,empty,empty,token,empty,empty,empty],
     [empty,empty,empty,empty,empty,empty,empty],
     [invalid,empty,empty,empty,empty,empty,invalid],
