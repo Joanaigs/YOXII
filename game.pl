@@ -9,13 +9,13 @@ convertToInt(StringNumber, Number) :-atom_chars(StringNumber, Z), number_chars(N
  *      @param ThisTurn
  *      @param NextTurn
  * 
- *      Prints the board and the players remaning pieces and starts the game
+ *      Prints the GameSate and the players remaning pieces and starts the game
  */
 startGame(ThisTurn, NextTurn) :-
-    initialBoard(Board),
+    initialBoard(GameSate),
     initialPiecesRed(RedPieces),
     initialPiecesWhite(WhitePieces),
-    game_cycle(ThisTurn, NextTurn, Board, white, RedPieces, WhitePieces).
+    game_cycle(ThisTurn, NextTurn, GameSate, white, RedPieces, WhitePieces).
     
 
 /**
@@ -57,19 +57,19 @@ update_players_pieces(white, OldRedPieces, _, Pieces,  OldRedPieces, Pieces).
 
 
 /**
- * game_over(+Board, +Player)
- *      @param Board
+ * game_over(+GameSate, +Player)
+ *      @param GameSate
  *      @param Player
  * 
  *      Checks if the game is over by seing if the player has any moves left
  */
-game_over(Board, Player) :- 
-    \+ valid_moves_token(Board, Player, _Moves).
+game_over(GameSate, Player) :- 
+    \+ valid_moves_token(GameSate, Player, _Moves).
 
 
 /**
- * getPoints(+Board, +TokenPosition, +Direction, +Player, +Points, -NewPoints)
- *      @param Board
+ * getPoints(+GameSate, +TokenPosition, +Direction, +Player, +Points, -NewPoints)
+ *      @param GameSate
  *      @param TokenPosition (TokenLine-TokenCol)
  *      @param Direction
  *      @param Player
@@ -78,9 +78,9 @@ game_over(Board, Player) :-
  * 
  * Calculates the points of the player in a certain direction of the token and returns them in NewPoints
  */
-getPoints(Board, TLine-TCol, Direction, Player, Points, NewPoints) :- 
+getPoints(GameSate, TLine-TCol, Direction, Player, Points, NewPoints) :- 
                                                         previous_cell(TLine-TCol, Direction, Line-Col),
-                                                        getPiece(Board, Line-Col, Piece),
+                                                        getPiece(GameSate, Line-Col, Piece),
                                                         symbol(Piece, _, Player), 
                                                         points(Piece, PiecePoints), 
                                                         NewPoints is Points + PiecePoints.
@@ -89,23 +89,23 @@ getPoints(_, _, _, _, Points, Points).
 
 
 /** 
- * countPoints(+Board, +Player, -Points)
- *      @param Board
+ * value(+GameSate, +Player, -Points)
+ *      @param GameSate
  *      @param Player
  *      @param Points
  * 
  *      Calculates the points of the player by summing the values of their pieces that suround the token 
  */
-countPoints(Board, Player, Points, Pieces) :-
-        getPiece(Board, TLine-TCol, token),
-        getPoints(Board, TLine-TCol, up,        Player, 0      , Points1), (Points1 > 0 -> Pieces1 = Pieces + 1; Pieces1 = 0), 
-        getPoints(Board, TLine-TCol, down,      Player, Points1, Points2), (Points1 == Points2 -> Pieces2 = Pieces1 + 1; Pieces2 = Pieces1), 
-        getPoints(Board, TLine-TCol, right,     Player, Points2, Points3), (Points2 == Points3 -> Pieces3 = Pieces2 + 1; Pieces3 = Pieces2), 
-        getPoints(Board, TLine-TCol, left,      Player, Points3, Points4), (Points3 == Points4 -> Pieces4 = Pieces3 + 1; Pieces4 = Pieces3),  
-        getPoints(Board, TLine-TCol, upLeft,    Player, Points4, Points5), (Points4 == Points5 -> Pieces5 = Pieces4 + 1; Pieces5 = Pieces4),  
-        getPoints(Board, TLine-TCol, upRight,   Player, Points5, Points6), (Points5 == Points6 -> Pieces6 = Pieces5 + 1; Pieces6 = Pieces5),  
-        getPoints(Board, TLine-TCol, downLeft,  Player, Points6, Points7), (Points6 == Points7 -> Pieces7 = Pieces6 + 1; Pieces7 = Pieces6),  
-        getPoints(Board, TLine-TCol, downRight, Player, Points7, Points),  (Points7 == Points ->  Pieces = Pieces7 + 1; Pieces = Pieces7).
+value(GameSate, Player, Points, Pieces) :-
+        getPiece(GameSate, TLine-TCol, token),
+        getPoints(GameSate, TLine-TCol, up,        Player, 0      , Points1), (Points1 > 0 -> Pieces1 = Pieces + 1; Pieces1 = 0), 
+        getPoints(GameSate, TLine-TCol, down,      Player, Points1, Points2), (Points1 == Points2 -> Pieces2 = Pieces1 + 1; Pieces2 = Pieces1), 
+        getPoints(GameSate, TLine-TCol, right,     Player, Points2, Points3), (Points2 == Points3 -> Pieces3 = Pieces2 + 1; Pieces3 = Pieces2), 
+        getPoints(GameSate, TLine-TCol, left,      Player, Points3, Points4), (Points3 == Points4 -> Pieces4 = Pieces3 + 1; Pieces4 = Pieces3),  
+        getPoints(GameSate, TLine-TCol, upLeft,    Player, Points4, Points5), (Points4 == Points5 -> Pieces5 = Pieces4 + 1; Pieces5 = Pieces4),  
+        getPoints(GameSate, TLine-TCol, upRight,   Player, Points5, Points6), (Points5 == Points6 -> Pieces6 = Pieces5 + 1; Pieces6 = Pieces5),  
+        getPoints(GameSate, TLine-TCol, downLeft,  Player, Points6, Points7), (Points6 == Points7 -> Pieces7 = Pieces6 + 1; Pieces7 = Pieces6),  
+        getPoints(GameSate, TLine-TCol, downRight, Player, Points7, Points),  (Points7 == Points ->  Pieces = Pieces7 + 1; Pieces = Pieces7).
 
 
 /** 
@@ -122,40 +122,40 @@ congratulations(_RedPoints, _WhitePoints,  NumPiecesRed, NumPiecesWhite) :- NumP
 congratulations(_RedPoints, _WhitePoints,  _NumPiecesRed, _NumPiecesWhite) :- write('You tied'), nl.
 
 /**
- * game_cycle(+ThisTurn, +NextTurn, +Board, +Player, +RedPieces, WhitePieces)
+ * game_cycle(+ThisTurn, +NextTurn, +GameSate, +Player, +RedPieces, WhitePieces)
  *      @param ThisTurn
  *      @param NextTurn
- *      @param Board
+ *      @param GameSate
  *      @param Player
  *      @param RedPieces
  *      @param WhitePieces
  * 
  *      The cycle of the game, where we start by seeing if the game has enough conditions to finish, and if not then the current player chooses their moves and give turn to the other player to do the same.
  */
-game_cycle(_, _, Board, Player, RedPieces, WhitePieces):- 
-                    display_game(Board, Player, RedPieces, WhitePieces),
-                    game_over(Board, Player), !, nl,
+game_cycle(_, _, GameSate, Player, RedPieces, WhitePieces):- 
+                    display_game(GameSate, Player, RedPieces, WhitePieces),
+                    game_over(GameSate, Player), !, nl,
                     write('Game Over!'),nl,
-                    countPoints(Board, red, RedPoints, NumRedPieces),
+                    value(GameSate, red, RedPoints, NumRedPieces),
                     write('Red: '), write(RedPoints),nl,
-                    countPoints(Board, white, WhitePoints, NumWhitePieces ),
+                    value(GameSate, white, WhitePoints, NumWhitePieces ),
                     write('White: '), write(WhitePoints),nl,nl,
                     congratulations(RedPoints, WhitePoints, NumRedPieces,  NumWhitePieces).
 
-game_cycle(ThisTurn, NextTurn ,Board, Player, RedPieces, WhitePieces):-
-                    choose_move(Board, Player, ThisTurn, RedPieces, WhitePieces, NewBoard, NewPieces),
+game_cycle(ThisTurn, NextTurn ,GameSate, Player, RedPieces, WhitePieces):-
+                    choose_move(GameSate, Player, ThisTurn, RedPieces, WhitePieces, NewGameSate, NewPieces),
                     % update players pieces
                     update_players_pieces(Player, RedPieces, WhitePieces, NewPieces, NewRedPieces, NewWhitePieces),
                     next_player(Player, NextPlayer),
                     nl,nl,
-                    game_cycle(NextTurn, ThisTurn, NewBoard, NextPlayer, NewRedPieces, NewWhitePieces).
+                    game_cycle(NextTurn, ThisTurn, NewGameSate, NextPlayer, NewRedPieces, NewWhitePieces).
 
 
 
 /** 
- * change_number_letter(+ValidMoves, -ValidMovesBoard)
+ * change_number_letter(+ValidMoves, -ValidMovesGameSate)
  *      @param ValidMoves [(Line-Column))]
- *      @param ValidMovesBoard [(Line-Column))]
+ *      @param ValidMovesGameSate [(Line-Column))]
  * 
  *      Receives a list of Moves of type Number-Number and changes it to an array of Moves of type Char-Number, for example '1-1' turns to 'a-1'
  */
@@ -202,46 +202,46 @@ replace([X|List1], Index, New, [X|List2]) :-  Index>1,
 
 
 /** 
- * move(+Board, +Line, +Column, +NewElem, -NewBoard)
- *      @param Board
+ * move(+GameSate, +Line, +Column, +NewElem, -NewGameSate)
+ *      @param GameSate
  *      @param Line
  *      @param Column
  *      @param NewElem
- *      @param NewBoard
+ *      @param NewGameSate
  * 
- *      Selects a line of the board where a element of a certain column is changed with the help of the predicate replace
+ *      Selects a line of the GameSate where a element of a certain column is changed with the help of the predicate replace
  */
-move([Line|Board], 1, Column, Piece, [NewLine|Board]) :- replace(Line, Column, Piece, Result), NewLine=Result.
-move([Line|Board], IndexLine, Column, Piece, [Line|NewBoard]) :- Temp is IndexLine-1, move(Board, Temp, Column, Piece, NewBoard).
+move([Line|GameSate], 1, Column, Piece, [NewLine|GameSate]) :- replace(Line, Column, Piece, Result), NewLine=Result.
+move([Line|GameSate], IndexLine, Column, Piece, [Line|NewGameSate]) :- Temp is IndexLine-1, move(GameSate, Temp, Column, Piece, NewGameSate).
 
 
 /**
- * move(+Board, +OldLine-OldColumn, +NewLine-NewColumn, -NewBoard)
- *      @param Board - current board
+ * move(+GameSate, +OldLine-OldColumn, +NewLine-NewColumn, -NewGameSate)
+ *      @param GameSate - current GameSate
  *      @param OldLine-OldColumn - position of the piece
  *      @param NewLine-NewColumn - position of the piece after the move
- *      @param NewBoard - new board with the piece moved
+ *      @param NewGameSate - new GameSate with the piece moved
  * 
  *  
  *      This predicate is used to move a piece from OldLine-OldColumn to NewLine-NewColumn.
  * */
-move(Board,  OldLine-OldColumn, NewLine-NewColumn,NewBoard) :- 
-    getPiece(Board, OldLine-OldColumn, Piece),
-    move(Board, NewLine, NewColumn, Piece, TmpBoard),
-    move(TmpBoard, OldLine, OldColumn, empty, NewBoard).
+move(GameSate,  OldLine-OldColumn, NewLine-NewColumn,NewGameSate) :- 
+    getPiece(GameSate, OldLine-OldColumn, Piece),
+    move(GameSate, NewLine, NewColumn, Piece, TmpGameSate),
+    move(TmpGameSate, OldLine, OldColumn, empty, NewGameSate).
 
 
 /** 
- * getPiece(+Board, ?Position, ?Piece)
- *      @param Board
+ * getPiece(+GameSate, ?Position, ?Piece)
+ *      @param GameSate
  *      @param Position (line-column)
  *      @param Piece
  * 
- *      Returns the element in the position given of the board or returns the position of an element on the board
+ *      Returns the element in the position given of the GameSate or returns the position of an element on the GameSate
  */
-getPiece(Board, Line-Column, Piece) :-
-    nth1(Line, Board, BoardLine),
-    nth1(Column, BoardLine, Piece).
+getPiece(GameSate, Line-Column, Piece) :-
+    nth1(Line, GameSate, GameSateLine),
+    nth1(Column, GameSateLine, Piece).
 
 /**
  * previous_cell(+PositionElement, +Direction, -PositionDiretion)
