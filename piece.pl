@@ -77,6 +77,15 @@ movePiece(Board, NewBoard, Moves, Piece) :- write('Invalid Position'), nl, moveP
  *      It returns true if the position is empty and it is around the token, false otherwise.
  *
  * */
+
+/**
+ * check_move_piece(+Board, -Line-Column)
+ *      @param Board - current board
+ *      @param Line-Column - position to check
+ *      
+ *      This predicate is used to check if a move is valid.
+ *      It returns true if the position is empty and it is around the token, false otherwise.
+ */
 check_move_piece(Board, Line-Column) :- getPiece(Board, Line-Column, Piece), 
                                                 Piece == empty,
                                                 getPiece(Board, TLine-TColumn, token),  DiffLine is abs(TLine - Line), DiffCol is abs(TColumn - Column),                                       
