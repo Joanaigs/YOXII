@@ -27,8 +27,6 @@ choose_move_token(GameState, Player, NewGameState, 'PC'-1):-
     letter(Line,CharLine),
     nl, write('Move token to ') , write(CharLine-Column), nl.
 
-choose_move_token(_GameState, _Player, _NewGameState, 'PC'-2).
-
     
 /**
  * moveToken(+GameState, -NewGameState, +Player)

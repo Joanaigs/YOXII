@@ -17,15 +17,15 @@ manageInput('1') :-
     startGame('H', 'H').
 manageInput('2') :- 
     printLevel,
-    askLevel(Level),
+    askLevel(Level),!, Level \= 0,
     startGame('H', 'PC'-Level).
 manageInput('3') :- 
     printLevel,
-    askLevel(Level),
+    askLevel(Level),!, Level \= 0,
     startGame('PC'-Level, 'H').
 manageInput('4') :-
     printLevel,
-    askLevel(Level), 
+    askLevel(Level),!, Level \= 0,
     startGame('PC'-Level, 'PC'-Level).
 manageInput('0') :- !, fail.
 
@@ -58,11 +58,11 @@ play :-
 askLevel(Level) :-
     get_char(Input),
     skip_line,
-    convertToInt(Input, Level),
-    (Level = 1; Level = 2).
+    (Input == '1' ; Input == '2' ; Input == '0'),
+    convertToInt(Input, Level).
 
-askLevel(Level) :-
-    write('Invalid Level!'),nl,
+askLevel(Level) :- 
+    write('Invalid Level!'),nl,!,
     askLevel(Level).
 
 /**
