@@ -23,7 +23,7 @@ choose_move_token(Board, Player, NewBoard, 'PC'-1):-
     valid_moves_token(Board, Player, Moves),
     random_member(Line-Column, Moves),
     getPiece(Board, TokenL-TokenC, token),
-    move(Board, NewBoard, TokenL-TokenC, Line-Column),
+    move(Board, TokenL-TokenC, Line-Column, NewBoard),
     letter(Line,CharLine),
     nl, write('Move token to ') , write(CharLine-Column), nl.
 
@@ -53,7 +53,7 @@ moveToken(Board, NewBoard, Player) :- nl,
                             select_move(Line-Column, Moves),
                             
                             getPiece(Board, TokenL-TokenC, token),
-                            move(Board, NewBoard, TokenL-TokenC, Line-Column).
+                            move(Board, TokenL-TokenC, Line-Column, NewBoard).
 
 /**
  *  get_direction(+Line-Column, +TokenL-TokenC, -Direction)
@@ -122,16 +122,3 @@ check_move(Board, Player, Line-Column) :-
 valid_moves_token(Board, Player,Moves):-
     setof(Line-Column, check_move(Board, Player, Line-Column), Moves).
 
-/**
- * move(+Board, -NewBoard, +OldLine-OldColumn, +NewLine-NewColumn)
- *      @param Board - current board
- *      @param NewBoard - new board with the piece moved
- *      @param OldLine-OldColumn - position of the piece
- *      @param NewLine-NewColumn - position of the piece after the move
- *  
- *      This predicate is used to move a piece from OldLine-OldColumn to NewLine-NewColumn.
- * */
-move(Board, NewBoard, OldLine-OldColumn, NewLine-NewColumn) :- 
-                    getPiece(Board, OldLine-OldColumn, Piece),
-                    setPiece(Board, TmpBoard, NewLine, NewColumn, Piece),
-                    setPiece(TmpBoard, NewBoard, OldLine, OldColumn, empty).

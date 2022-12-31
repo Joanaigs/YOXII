@@ -202,17 +202,33 @@ replace([X|List1], Index, New, [X|List2]) :-  Index>1,
 
 
 /** 
- * setPiece(+Board, -NewBoard, +Line, +Column, +NewElem)
+ * move(+Board, +Line, +Column, +NewElem, -NewBoard)
  *      @param Board
- *      @param NewBoard
  *      @param Line
  *      @param Column
  *      @param NewElem
+ *      @param NewBoard
  * 
  *      Selects a line of the board where a element of a certain column is changed with the help of the predicate replace
  */
-setPiece([Line|Board], [NewLine|Board], 1, Column, Piece) :- replace(Line, Column, Piece, Result), NewLine=Result.
-setPiece([Line|Board], [Line|NewBoard], IndexLine, Column, Piece) :- Temp is IndexLine-1, setPiece(Board, NewBoard, Temp, Column, Piece).
+move([Line|Board], 1, Column, Piece, [NewLine|Board]) :- replace(Line, Column, Piece, Result), NewLine=Result.
+move([Line|Board], IndexLine, Column, Piece, [Line|NewBoard]) :- Temp is IndexLine-1, move(Board, Temp, Column, Piece, NewBoard).
+
+
+/**
+ * move(+Board, -NewBoard, +OldLine-OldColumn, +NewLine-NewColumn)
+ *      @param Board - current board
+ *      @param OldLine-OldColumn - position of the piece
+ *      @param NewLine-NewColumn - position of the piece after the move
+ *      @param NewBoard - new board with the piece moved
+ * 
+ *  
+ *      This predicate is used to move a piece from OldLine-OldColumn to NewLine-NewColumn.
+ * */
+move(Board,  OldLine-OldColumn, NewLine-NewColumn,NewBoard) :- 
+    getPiece(Board, OldLine-OldColumn, Piece),
+    move(Board, NewLine, NewColumn, Piece, TmpBoard),
+    move(TmpBoard, OldLine, OldColumn, empty, NewBoard).
 
 
 /** 

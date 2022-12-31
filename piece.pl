@@ -40,7 +40,7 @@ choose_move_piece(Board, _, NewBoard, Pieces, NewPieces, 'PC'-1):-
     random_member(Piece, PiecesList),
     valid_moves_piece(Board, Moves),
     random_member(Line-Column, Moves),
-    setPiece(Board, NewBoard, Line, Column, Piece),
+    move(Board, Line, Column, Piece, NewBoard),
     usePiece(Pieces, Piece, NewPieces),
     letter(Line, CharLine),
     symbol(Piece, Symbol, _),
@@ -64,7 +64,7 @@ movePiece(Board, NewBoard, Moves, Piece) :-
                                     write('Choose the piece position (Ex: d-3): '),
                                     getPosition(Line-Column),
                                     select_move(Line-Column, Moves),
-                                    setPiece(Board, NewBoard, Line, Column, Piece).
+                                    move(Board, Line, Column, Piece, NewBoard).
 movePiece(Board, NewBoard, Moves, Piece) :- write('Invalid Position'), nl, movePiece(Board, NewBoard, Moves, Piece). 
 
 

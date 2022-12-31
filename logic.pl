@@ -17,7 +17,7 @@
 find_piece_position(Board, Player,  Pieces, Moves, Line-Column, Piece, Points) :-
     existPiece(Pieces, Piece),
     select_move(Line-Column, Moves),
-    setPiece(Board, NewBoard, Line, Column, Piece), 
+    move(Board, Line, Column, Piece, NewBoard), 
     countPoints(NewBoard, Player, Points, _).
 
 /**
@@ -76,8 +76,8 @@ find_best_move(_,_,[],Points1-(TLine1-TColumn1)-(PLine1-PColumn1)-Piece1,_,_) :-
 find_best_move(Board, Player, [Points-(TLine-TColumn)-(PLine-PColumn)-Piece | Resto], BPoints-BTMove-BPMove-BPiece,  RedPieces, WhitePieces):-
     
     getPiece(Board, TokenL-TokenC, token),
-    move(Board, Temp, TokenL-TokenC, TLine-TColumn),
-    setPiece(Temp, NewBoard, PLine, PColumn, Piece),
+    move(Board, TokenL-TokenC, TLine-TColumn, Temp),
+    move(Temp, PLine, PColumn, Piece, NewBoard),
     
     next_player(Player, NextPlayer),
     game_over(NewBoard, NextPlayer),!,
@@ -96,8 +96,9 @@ find_best_move(Board, Player, [_Points-(TLine-TColumn)-(PLine-PColumn)-Piece | R
     ListMove = ListPointsDiff-(TLine1-TColumn1)-(PLine1-PColumn1)-Piece1,
 
     getPiece(Board, TokenL-TokenC, token),
-    move(Board, Temp, TokenL-TokenC, TLine-TColumn),
-    setPiece(Temp, NewBoard1, PLine, PColumn, Piece),
+    move(Board, TokenL-TokenC, TLine-TColumn, Temp),
+    move(Temp, PLine, PColumn, Piece, NewBoard1),
+
     get_players_pieces(Player, RedPieces, WhitePieces, Pieces),
     usePiece(Pieces, Piece, NewPieces),
     update_players_pieces(Player, RedPieces, WhitePieces, NewPieces, NewRedPieces, NewWhitePieces),
@@ -107,8 +108,8 @@ find_best_move(Board, Player, [_Points-(TLine-TColumn)-(PLine-PColumn)-Piece | R
     choose_move_greedy(NewBoard1, NextPlayer, NewRedPieces, NewWhitePieces, (WTLine-WTColumn), WPiece, (WPMove-WPColumn), last_move), 
     getPiece(NewBoard1, WTokenL-WTokenC, token),
     
-    move(NewBoard1, TNewBoard, WTokenL-WTokenC, WTLine-WTColumn),
-    setPiece(TNewBoard, NewBoard, WPMove, WPColumn, WPiece),
+    move(NewBoard1, WTokenL-WTokenC, WTLine-WTColumn, TNewBoard),
+    move(TNewBoard, WPMove, WPColumn, WPiece, NewBoard),
 
     % count player points
     countPoints(NewBoard, Player, ThisPoints, _),  
@@ -145,7 +146,7 @@ choose_move_greedy(Board, Player,  RedPieces, WhitePieces, TMove, Piece, PMove, 
     setof(Points-(TLine-TColumn)-(PLine-PColumn)-Piece, 
         TempNewBoard^(
                 select_move(TLine-TColumn, Moves),
-                move(Board, TempNewBoard, TokenL-TokenC, TLine-TColumn),
+                move(Board, TokenL-TokenC, TLine-TColumn, TempNewBoard),
                 find_best_piece(TempNewBoard, Player,  RedPieces, WhitePieces, PLine-PColumn, Piece, Points)),
             Final),
     last(Final, Points-TMove-PMove-Piece).
@@ -156,7 +157,7 @@ choose_move_greedy(Board, Player,  RedPieces, WhitePieces, TMove, Piece, PMove) 
     setof(Points-(TLine-TColumn)-(PLine-PColumn)-Piece, 
         TempNewBoard^(
                 select_move(TLine-TColumn, Moves),
-                move(Board, TempNewBoard, TokenL-TokenC, TLine-TColumn),
+                move(Board, TokenL-TokenC, TLine-TColumn, TempNewBoard),
                 find_best_piece(TempNewBoard, Player,  RedPieces, WhitePieces, PLine-PColumn, Piece, Points)),
             Final),
     find_best_move(Board, Player, Final, _-TMove-PMove-Piece, RedPieces, WhitePieces).
@@ -181,7 +182,7 @@ choose_move(Board, Player, 'PC'-2, RedPieces, WhitePieces, NewBoard, NewPieces) 
 
     % move token
     getPiece(Board, TokenL-TokenC, token),
-    move(Board, TempBoard, TokenL-TokenC, TLine-TColumn),
+    move(Board, TokenL-TokenC, TLine-TColumn, TempBoard),
     letter(TLine,CharLineT),
     nl, write('Move token to ') , write(CharLineT-TColumn), nl,
     sleep(1),
@@ -189,7 +190,7 @@ choose_move(Board, Player, 'PC'-2, RedPieces, WhitePieces, NewBoard, NewPieces) 
     draw_game(TempBoard, Player, RedPieces, WhitePieces),
 
     % place piece
-    setPiece(TempBoard, NewBoard, PLine, PColumn, Piece),
+    move(TempBoard, PLine, PColumn, Piece, NewBoard),
     get_players_pieces(Player, RedPieces, WhitePieces, Pieces),
     usePiece(Pieces, Piece, NewPieces),
     
