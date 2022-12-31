@@ -216,7 +216,7 @@ move([Line|Board], IndexLine, Column, Piece, [Line|NewBoard]) :- Temp is IndexLi
 
 
 /**
- * move(+Board, -NewBoard, +OldLine-OldColumn, +NewLine-NewColumn)
+ * move(+Board, +OldLine-OldColumn, +NewLine-NewColumn, -NewBoard)
  *      @param Board - current board
  *      @param OldLine-OldColumn - position of the piece
  *      @param NewLine-NewColumn - position of the piece after the move
