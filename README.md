@@ -1,7 +1,7 @@
 # YOXII
 Grupo Yoxii_5:
-- up202004598: Afonso Castanheira de Abreu Nabais Baldo -50
--  up202006279: Joana Inês Gonçalves Santos
+- up202004598: Afonso Castanheira de Abreu Nabais Baldo - contribution 50%
+-  up202006279: Joana Inês Gonçalves Santos - contribution 50%
 
 ## Table of contents
 - [Installation and Execution](#installation-and-execution)
