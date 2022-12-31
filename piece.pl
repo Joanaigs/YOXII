@@ -1,11 +1,37 @@
 :- use_module(library(random)).
 
+/** existPiece(+Pieces, -Piece)
+ *      @param Pieces - list of pieces
+ *      @param Piece - piece to check
+ *      
+ *      This predicate is used to check if a piece exists in the list of pieces.
+ *      It returns true if the piece exists, false otherwise.
+ *
+ * */
 existPiece([Piece-Number | _], Piece) :- Number > 0.
 existPiece([_Symbol-_ | List], Piece) :- existPiece(List, Piece).
 
+/** usePiece(+Pieces, +Piece, -NewPieces)
+ *      @param Pieces - list of pieces
+ *      @param Piece - piece to use
+ *      @param NewPieces - list of pieces with the piece used
+ *      
+ *      This predicate is used to subtract the number of that piece from the list of pieces.
+ *      It returns the list of pieces with the piece used.
+ *
+ * */
 usePiece([Piece-Number | List], Piece, [Piece-N | List])  :- N is Number-1.
 usePiece([Symbol-Number| List], Piece, [Symbol-Number| NewList]) :- usePiece(List, Piece, NewList).
 
+/** readPiece(+Pieces, -Piece, +Player)
+ *      @param Pieces - list of pieces
+ *      @param Piece - piece to read
+ *      @param Player - current player
+ *      
+ *      This predicate is used to read a piece from the input.
+ *      It returns the piece read.
+ *
+ * */
 readPiece(Pieces, Piece, Player) :- get_char(Symbol), skip_line,
                                     symbol(Piece, Symbol, Player), existPiece(Pieces, Piece).    
 
