@@ -89,10 +89,11 @@ getPoints(_, _, _, _, Points, Points).
 
 
 /** 
- * value(+GameSate, +Player, -Points)
+ * value(+GameSate, +Player, -Points, -Pieces)
  *      @param GameSate
  *      @param Player
  *      @param Points
+ *      @param Pieces
  * 
  *      Calculates the points of the player by summing the values of their pieces that suround the token 
  */
