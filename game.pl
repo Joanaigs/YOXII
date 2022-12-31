@@ -133,7 +133,7 @@ congratulations(_RedPoints, _WhitePoints,  _NumPiecesRed, _NumPiecesWhite) :- wr
  *      The cycle of the game, where we start by seeing if the game has enough conditions to finish, and if not then the current player chooses their moves and give turn to the other player to do the same.
  */
 game_cycle(_, _, Board, Player, RedPieces, WhitePieces):- 
-                    draw_game(Board, Player, RedPieces, WhitePieces),
+                    display_game(Board, Player, RedPieces, WhitePieces),
                     game_over(Board, Player), !, nl,
                     write('Game Over!'),nl,
                     countPoints(Board, red, RedPoints, NumRedPieces),

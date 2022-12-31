@@ -90,7 +90,7 @@ initialPiecesRed([redOne-5, redTwo-5, redThree-5, redFour-3]).
 initialPiecesWhite([whiteOne-5, whiteTwo-5, whiteThree-5, whiteFour-3]).
 
 /**
- * draw_game( +Board, +Player, +RedPieces, +WhitePieces)
+ * display_game( +Board, +Player, +RedPieces, +WhitePieces)
  *     @param Board is the current board.
  *     @param Player is the current player.
  *     @param RedPieces is a list of pieces and the number of pieces of that type. [Piece-Number, Piece-Number, ...]
@@ -98,7 +98,7 @@ initialPiecesWhite([whiteOne-5, whiteTwo-5, whiteThree-5, whiteFour-3]).
  *
  *      Draws the current game board, and the pieces of each player.
 */
-draw_game(Board, Player, RedPieces, WhitePieces) :-
+display_game(Board, Player, RedPieces, WhitePieces) :-
     nl,
     write('          Player '),
     write(Player),

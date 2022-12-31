@@ -187,7 +187,7 @@ choose_move(Board, Player, 'PC'-2, RedPieces, WhitePieces, NewBoard, NewPieces) 
     nl, write('Move token to ') , write(CharLineT-TColumn), nl,
     sleep(1),
     
-    draw_game(TempBoard, Player, RedPieces, WhitePieces),
+    display_game(TempBoard, Player, RedPieces, WhitePieces),
 
     % place piece
     move(TempBoard, PLine, PColumn, Piece, NewBoard),
@@ -204,7 +204,7 @@ choose_move(Board, Player, ThisTurn, RedPieces, WhitePieces, NewBoard, NewPieces
     % choose token move
     choose_move_token(Board, Player, TempBoard , ThisTurn),
     sleep(1),
-    draw_game(TempBoard, Player, RedPieces, WhitePieces),
+    display_game(TempBoard, Player, RedPieces, WhitePieces),
     % choose piece move
     get_players_pieces(Player, RedPieces, WhitePieces, Pieces),
     choose_move_piece(TempBoard, Player, NewBoard,Pieces, NewPieces, ThisTurn),
