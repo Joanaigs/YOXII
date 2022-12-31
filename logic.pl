@@ -1,6 +1,6 @@
-:- consult('token.pl').
-:- consult('piece.pl').
+
 :- use_module(library(lists)).
+:- use_module(library(system)).
 
 
 escolher_posicao_peca(Board, Player,  Pieces, Moves, Line-Column, Piece, Points) :-
@@ -116,8 +116,9 @@ choose_move(Board, Player, 'PC'-2, RedPieces, WhitePieces, NewBoard, NewPieces) 
 choose_move(Board, Player, ThisTurn, RedPieces, WhitePieces, NewBoard, NewPieces) :-
     % choose token move
     choose_move_token(Board, Player, TempBoard , ThisTurn),
+    sleep(1),
     draw_game(TempBoard, Player, RedPieces, WhitePieces),
-
     % choose piece move
     get_players_pieces(Player, RedPieces, WhitePieces, Pieces),
-    choose_move_piece(TempBoard, Player, NewBoard,Pieces, NewPieces, ThisTurn).
+    choose_move_piece(TempBoard, Player, NewBoard,Pieces, NewPieces, ThisTurn),
+    sleep(1).

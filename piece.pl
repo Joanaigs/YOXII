@@ -1,5 +1,4 @@
 :- use_module(library(random)).
-:- use_module(library(system)).
 
 existPiece([Piece-Number | _], Piece) :- Number > 0.
 existPiece([_Symbol-_ | List], Piece) :- existPiece(List, Piece).
@@ -46,7 +45,6 @@ choose_move_piece(Board, _, NewBoard, Pieces, NewPieces, 'PC'-1):-
     letter(Line, CharLine),
     symbol(Piece, Symbol, _),
     nl,write('Add piece '), write(Symbol) , write(' to ') , write(CharLine-Column), nl.
-    sleep(1).
 
     
 

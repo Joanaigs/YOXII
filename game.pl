@@ -119,7 +119,7 @@ congratulations(RedPoints, WhitePoints, _NumPiecesRed, _NumPiecesWhite) :- RedPo
 congratulations(RedPoints, WhitePoints,  _NumPiecesRed, _NumPiecesWhite) :- WhitePoints > RedPoints, !, write('Congratulations white you won!'), nl.
 congratulations(_RedPoints, _WhitePoints,  NumPiecesRed, NumPiecesWhite) :- NumPiecesRed > NumPiecesWhite, !, write('Congratulations red you won! You had more Pieces surrounding the token'), nl.
 congratulations(_RedPoints, _WhitePoints,  NumPiecesRed, NumPiecesWhite) :- NumPiecesRed < NumPiecesWhite, !, write('Congratulations white you won! You had more Pieces surrounding the token'), nl.
-congratulations(_RedPoints, _WhitePoints,  NumPiecesRed, NumPiecesWhite) :- write('You tied'), nl.
+congratulations(_RedPoints, _WhitePoints,  _NumPiecesRed, _NumPiecesWhite) :- write('You tied'), nl.
 
 /**
  * game_cycle(+ThisTurn, +NextTurn, +Board, +Player, +RedPieces, WhitePieces)

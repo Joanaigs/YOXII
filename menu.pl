@@ -1,8 +1,8 @@
 :- consult('board.pl').
-:- consult('logic.pl').
 :- consult('game.pl').
 :- consult('token.pl').
 :- consult('piece.pl').
+:- consult('logic.pl').
 
 /**
  * manageInput( +Input )
