@@ -58,7 +58,7 @@ choose_move_piece(GameState, Player, NewGameState, Pieces, NewPieces, 'H'):- nl,
                                 nl,
                                 movePiece(GameState, NewGameState, Moves, Piece),
                                 usePiece(Pieces, Piece, NewPieces).
-choose_move_piece(GameState, Player, NewGameState, Pieces, NewPieces, 'H') :- write('Invalid Piece'), nl, choose_move_piece(GameState, Player, NewGameState, Pieces, NewPieces).
+choose_move_piece(GameState, Player, NewGameState, Pieces, NewPieces, 'H') :- write('Invalid Piece'), nl, choose_move_piece(GameState, Player, NewGameState, Pieces, NewPieces, 'H').
 
 
 choose_move_piece(GameState, _, NewGameState, Pieces, NewPieces, 'PC'-1):- 

@@ -18,7 +18,7 @@ find_piece_position(GameState, Player,  Pieces, Moves, Line-Column, Piece, Point
     existPiece(Pieces, Piece),
     select_move(Line-Column, Moves),
     move(GameState, Line, Column, Piece, NewGameState), 
-    countPoints(NewGameState, Player, Points, _).
+    value(NewGameState, Player, Points, _).
 
 /**
  * find_best_piece(+GameState, +Player, +RedPieces, +WhitePieces, -Line-Column, -Piece, -Points)
@@ -84,7 +84,7 @@ find_best_move(GameState, Player, [Points-(TLine-TColumn)-(PLine-PColumn)-Piece 
     
     find_best_move(GameState, Player, Resto, Points1-(TLine1-TColumn1)-(PLine1-PColumn1)-Piece1, RedPieces, WhitePieces),
     
-    countPoints(NewGameState, NextPlayer, OtherPoints, _),
+    value(NewGameState, NextPlayer, OtherPoints, _),
 
     compares_choose(Points, Points-(TLine-TColumn)-(PLine-PColumn)-Piece, OtherPoints, Points1-(TLine1-TColumn1)-(PLine1-PColumn1)-Piece1, BPoints-BTMove-BPMove-BPiece).
     
@@ -112,11 +112,11 @@ find_best_move(GameState, Player, [_Points-(TLine-TColumn)-(PLine-PColumn)-Piece
     move(TNewGameState, WPMove, WPColumn, WPiece, NewGameState),
 
     % count player points
-    countPoints(NewGameState, Player, ThisPoints, _),  
+    value(NewGameState, Player, ThisPoints, _),  
     ThisMove = ThisPoints-(TLine-TColumn)-(PLine-PColumn)-Piece,
 
     % count other player points
-    countPoints(NewGameState, NextPlayer, OtherPoints, _),
+    value(NewGameState, NextPlayer, OtherPoints, _),
 
     PointsDiff is ThisPoints - OtherPoints,
 
